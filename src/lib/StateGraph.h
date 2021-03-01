@@ -21,10 +21,10 @@ using transition_flist_t = std::forward_list<types::state_hash_t>;
 class StateGraph
 {
 public:
-    void add_vertex(StateID&& p_vertex_from, StateID&& p_vertex_to) 
+    void add_vertex(types::StateTag const& p_vertex_from, types::StateTag const& p_vertex_to) 
     {
-        auto [it_from, ret_from] = m_vertices.try_emplace(p_vertex_from.hash, std::move(p_vertex_from));
-        auto [it_to, ret_to] = m_vertices.try_emplace(p_vertex_from.hash, std::move(p_vertex_from));
+        auto [it_from, ret_from] = m_vertices.try_emplace(p_vertex_from.hash, p_vertex_from);
+        auto [it_to, ret_to] = m_vertices.try_emplace(p_vertex_from.hash, p_vertex_from);
 
         auto const id_from = it_from->first;
         auto const id_to = it_to->first;
@@ -37,7 +37,7 @@ public:
     }
 
 private:
-    std::unordered_map<types::state_hash_t, StateID> m_vertices;    
+    std::unordered_map<types::state_hash_t, types::StateTag> m_vertices;    
     std::unordered_map<types::state_hash_t, transition_flist_t> m_transitions;    
 };
 

@@ -35,7 +35,7 @@ public:
      */
     FiniteStateMachine() noexcept
     {
-        (add_to_graph(TStates::tag()), ...);
+        (add_to_graph(TStates::tag(), TStates::transitions()), ...);
     }
 
     FiniteStateMachine(FiniteStateMachine const&) = delete;
@@ -48,7 +48,7 @@ public:
     void handle(Event&& p_event) 
     {
         auto handle_event = [this, p_event] (auto p_state) {
-            p_state->handle(p_event); //.execute(*this);
+            p_state->self().handle(p_event); //.execute(*this);
         };
         std::visit(handle_event, m_current_state);
     }
@@ -89,9 +89,12 @@ private:
 
     }
 
-    void add_to_graph(StateTag p_tag)
+    template <size_t N>
+    constexpr void add_to_graph(types::StateTag const& p_from, std::array<types::StateTag, N> const& p_tos)
     {
-
+        std::for_each(p_tos.begin(), p_tos.end(), [this, &p_from] (types::StateTag const& p_to) {
+            m_graph.add_vertex(p_from, p_to);
+        });
     }
 
     //
@@ -106,6 +109,7 @@ private:
     /// @brief The current state. The first state template parameter will be the very first state.
     std::variant<TStates*...> m_current_state{&std::get<0>(m_states)};
 
+    /// @brief Contains the state machine graph
     StateGraph m_graph;
 };
 

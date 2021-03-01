@@ -13,12 +13,6 @@ namespace fsm {
 /**
  * @brief
  */
-struct StateTag final 
-{
-    char const* name;
-    types::state_hash_t hash{0u};
-};
-
 template <typename... T>
 struct All : std::true_type {};
 
@@ -31,18 +25,19 @@ template <typename Derived
 class State 
 {
 public:
-    static constexpr StateTag tag() { return { .name = TagName, .hash = util::hash(TagName) }; }
+    static constexpr types::StateTag tag() { return { .name = TagName, .hash = util::hash(TagName) }; }
 
     Derived& self() { return static_cast<Derived &>(*this); }
     Derived const& self() const { return static_cast<Derived const&>(*this); }
 
-    constexpr std::array<StateTag, sizeof...(Transitions)> transitions() {
+    static constexpr std::array<types::StateTag, sizeof...(Transitions)> transitions() {
         return { Transitions::tag()... };
     }
 
+protected:
+    State() = default;
+
 private:
-    // constexpr char const* const name() const { return TagName; }
-    // constexpr util::hash_t hash() const { return util::hash(TagName); }
 
 };
 
