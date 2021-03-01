@@ -2,15 +2,16 @@
 #define FSM_SRC_TESTS_GTEST_FINITE_STATE_MACHINE_H
 
 #include "FiniteStateMachine.h"
-// #include "StateCharging.h"
+#include "StateCharging.h"
 #include "StateConnected.h"
-// #include "StatePaused.h"
+#include "StatePaused.h"
 #include "StateReady.h"
 #include "StateScheduled.h"
 #include "EventReadyInit.h"
 #include "EventEVGunConnected.h"
 #include "fsm_types.h"
 
+#include <iostream>
 
 using ::testing::DoAll;
 using ::testing::Return;
@@ -43,7 +44,15 @@ TEST(FiniteStateMachine_stateID, GIVEN_states_THEN_returnCorrectStateIdentificat
 
 TEST(FiniteStateMachine_event, GIVEN_event_THEN_handleIt)
 {
-    fsm::FiniteStateMachine<StateReady> fsm;
+    fsm::FiniteStateMachine<StateReady, StateConnected, StatePaused, StateCharging> fsm;
+
+    StateReady ready;
+    auto id = ready.tag();
+
+    for (auto& tag : ready.transitions()) 
+    {
+        std::cout << tag.name << std::endl;
+    }
 
     EventReadyInit event{"Hi dear user"};
     fsm.handle(event);

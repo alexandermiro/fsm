@@ -4,31 +4,34 @@
 
 #include <iostream>
 
-#include "fsm_types.h"
+#include "state_common.h"
 #include "EventReadyInit.h"
 #include "EventEVGunConnected.h"
 #include "State.h"
 
 
-struct StateReady : public fsm::State<StateReady>
-{
-    DECLARE_STATE_ID_FUNC(fsm::types::StateCode::READY, "READY")
-
-    void handle(EventReadyInit const& p_init) {
-        std::cout << "from EventReadyInit - " << p_init.greetings << std::endl;
-    }
-
-    // void handle(EventEVGunConnected const& p_gun) {
-    //     std::cout << "from EventEVGunConnected - " << p_gun.x << " " << p_gun.y << std::endl;
-    // }
+struct StateReadyTag {
+    static inline char const name[] = "READY";
 };
 
-// BEGIN_DECLARE_STATE_CLASS(StateReady, READY) 
+class StateCharging;
+class StateConnected;
+class StatePaused;
 
-//     HANDLE_EVENT_NO_TRANSITION(EventReadyInit) {
+struct StateReady  : fsm::State<StateReady
+                               , StateReadyTag::name
+                               , StateConnected
+                               , StateCharging
+                               , StatePaused>
+{
 
-//     }
 
-// END_DECLARE_STATE_CLASS()
+    // TRANSITION_TO(StateConnected) handle(EventEVGunConnected const& p_ev_gun_connected) 
+    // {
+    //     return fsm::action::TransitionTo<StateConnected>{};
+    // }
+
+    fsm::action::DoNothing handle(EventReadyInit const& p_init);
+};
 
 #endif  // STATE_READY_H

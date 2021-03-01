@@ -9,7 +9,7 @@
 struct CarInfo
 {
     const char* model;
-    std::uint16_t year;
+    uint16_t year;
 };
 
 struct Maserati { static constexpr CarInfo info() { return { .model = "MC20", .year = 2021}; } };

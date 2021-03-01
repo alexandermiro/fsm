@@ -3,52 +3,47 @@
 #define FSM_SRC_LIB_FSM_TYPES_H
 
 #include <cstdint>
+#include <forward_list>
+
+#include "static_hash.h"
 
 namespace fsm::types {
-
-/**
- * @brief Contains all possible states codes
- * @note Put here every available state
- */
-enum class StateCode : std::uint8_t
-{
-    NONE                    = 0 
-    , READY                 = 1
-    , PAUSED                = 2
-    , CHARGING              = 3
-};
 
 /**
  * @brief Trivial type to identify a state
  */
 struct StateID 
 {
-    StateCode code;
-    char const* const label;
-    std::size_t idx;
+    char const* label{"NONE"};
+    std::size_t idx{0};
+    util::hash_t hash{0};
 };
 
-
-enum class EventCode : std::uint32_t
-{
-    NONE                    = 0
-};
-   
 /**
  * @brief
  */
 struct EventID
 {
-    EventCode code;
     char const* const label;
+    util::hash_t hash;
 };
+
+using state_hash_t = util::hash_t;
+
 
 } // namespace fsm::types
 
-#define DECLARE_STATE_ID_FUNC(state_code, state_name) \
-    static constexpr fsm::types::StateID id() { return {.code = state_code, .label = state_name}; };
+#define DECLARE_STATE(state_name)                                                                       \
+    static constexpr fsm::types::StateID id() {                                                         \
+        return {.label = state_name, .hash = fsm::util::hash(state_name) }; };
 
-#define DECLARE_EVENT_ID_FUNC(event_code, event_name) \
-    static constexpr fsm::types::EventID id() { return {.code = event_code, .label = event_name}; };
+
+#define DECLARE_EVENT(event_name) \
+    static constexpr fsm::types::EventID id() { \
+        return {.label = event_name, .hash = fsm::util::hash(event_name) }; };
+
+#define TRANSITION_TO(_NextState)                                                                       \
+    [[nodiscard]] fsm::action::TransitionTo<_NextState> 
+
 
 #endif // FSM_SRC_LIB_FSM_TYPES_H

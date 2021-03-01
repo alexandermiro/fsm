@@ -7,6 +7,9 @@ target_sources(fsm-lib
         FiniteStateMachine.h
         fsm_types.h
         TransitionTo.h
+        StateGraph.h
+        State.h
+        state_common.h
         )
 
 target_include_directories(fsm-lib

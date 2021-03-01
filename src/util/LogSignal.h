@@ -13,7 +13,7 @@
 
 namespace fsm::util::log {
 
-enum class LogLevel : std::uint8_t { Off   = 0
+enum class LogLevel : uint8_t { Off   = 0
                                    , Fatal = 1 << 1
                                    , Error = 1 << 2
                                    , Warn  = 1 << 3
@@ -38,8 +38,8 @@ constexpr char const* const tag(LogLevel type) {
  */
 struct LogSignal final {
     LogLevel      type{LogLevel::Info};
-    std::uint32_t line{0u};
-    std::uint32_t thread_id{0u};
+    uint32_t line{0u};
+    uint32_t thread_id{0u};
     char const*   emitter{nullptr};
     std::string   funcname{};
     std::string   payload{};
@@ -75,7 +75,7 @@ struct LogSignalDispatcher final {
     void emit_log(LogLevel p_type
                  , char const* p_emitter
                  , char const* pm_funcname
-                 , std::uint32_t p_line
+                 , uint32_t p_line
                  , Args&&... p_args) const & /* can only be called by a lvalue */ {
         assert(log != nullptr);
         LogSignal signal;
@@ -94,7 +94,7 @@ struct LogSignalDispatcher final {
 
     void emit_log_scope(char const* p_emitter
                  , char const* pm_funcname
-                 , std::uint32_t p_line
+                 , uint32_t p_line
                  , std::string const& p_payload) const & /* can only be called by a lvalue */ {
         assert(log != nullptr);
         LogSignal signal;
@@ -114,7 +114,7 @@ struct ScopeLog final {
     LogSignalDispatcher const* m_dispatcher{nullptr};
     char const*          m_emitter;
     char const*          m_funcname;
-    std::uint32_t        m_line;
+    uint32_t        m_line;
     std::string          m_msg_enter;
     std::string          m_msg_leave;
     
@@ -122,7 +122,7 @@ struct ScopeLog final {
     explicit ScopeLog(LogSignalDispatcher const* const p_dispatcher
                      , char const* p_emitter
                      , char const* p_funcname
-                     , std::uint32_t p_line
+                     , uint32_t p_line
                      , Args&&... p_args) 
         : m_dispatcher{p_dispatcher}
         , m_emitter{p_emitter}

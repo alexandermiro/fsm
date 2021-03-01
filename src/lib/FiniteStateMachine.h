@@ -7,12 +7,13 @@
 #include <tuple>
 #include <variant>
 #include <cassert>
+#include <string_view>
 
 #include "fsm_types.h"
 #include "AnyState.h"
 #include "for_each_tuple.h"
+#include "StateGraph.h"
 #include "State.h"
-
 
 
 namespace fsm {
@@ -34,14 +35,7 @@ public:
      */
     FiniteStateMachine() noexcept
     {
-        util::algo::for_each_tuple(m_states, [this] (auto& p_state, std::size_t p_idx) {
-            if (auto const state_code = p_state.id().code; m_state_umap.count(state_code) == 0) {
-                m_state_umap.try_emplace(state_code, p_idx);
-            }
-            else {
-                assert(false);   // Duplicated state
-            }
-        });
+        (add_to_graph(TStates::tag()), ...);
     }
 
     FiniteStateMachine(FiniteStateMachine const&) = delete;
@@ -62,29 +56,57 @@ public:
      * @brief
      */
     template <typename State>
-    void transition_to()
+    State& transition_to()
     {
-        // m_current_state = &std::get<State>(m_states);
+        State& state = &std::get<State>(m_states);
+        m_current_state = &state;
+        return state;
     }
     /**
      * @brief
      */
-    // constexpr std::size_t num_states() const { return sizeof...(TStates); }
 
 private:
+    void generate_graph()
+    {
+        // util::algo::for_each_tuple(m_states, [this] (auto& p_state, std::size_t p_idx) {
+
+            // auto const & transitions = p_state.transitions_to;
+
+            // std::for_each(transitions.begin(), transitions.end()
+            //              , [this] (Vertex const& p_vertex_to) {
+            //                     m_graph.add_vertex(Vertex{p_state.id()}, p_vertex_to);
+            // });
+
+            // if (auto const state_hash = p_state.id().hash; m_state_umap.count(state_hash) == 0) {
+            //     m_state_umap.try_emplace(state_hash, p_idx);
+            // }
+            // else {
+            //     assert(false);   // Duplicated state
+            // }
+        // });
+
+
+    }
+
+    void add_to_graph(StateTag p_tag)
+    {
+
+    }
 
     //
     // ========================================================== Attributes
     //
 
-    std::unordered_map<types::StateCode, std::size_t> m_state_umap;
+    std::unordered_map<util::hash_t, std::size_t> m_state_umap;
 
     /// @brief Contains all the states 
     std::tuple<TStates...> m_states;
 
     /// @brief The current state. The first state template parameter will be the very first state.
-
     std::variant<TStates*...> m_current_state{&std::get<0>(m_states)};
+
+    StateGraph m_graph;
 };
 
 

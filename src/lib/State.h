@@ -1,29 +1,50 @@
 
-#ifndef FSM_SRC_FSM_STATE_H
-#define FSM_SRC_FSM_STATE_H
+#ifndef FSM_SRC_LIB_STATE_H
+#define FSM_SRC_LIB_STATE_H
 
-#include <string_view>
+#include <algorithm>
+#include <type_traits>
+#include <array>
+
 #include "fsm_types.h"
 
 namespace fsm {
 
-template <typename Derived>
+/**
+ * @brief
+ */
+struct StateTag final 
+{
+    char const* name;
+    types::state_hash_t hash{0u};
+};
+
+template <typename... T>
+struct All : std::true_type {};
+
+/**
+ * @brief
+ */
+template <typename Derived
+         , char const* TagName
+         , typename... Transitions>
 class State 
 {
 public:
-    constexpr State() noexcept
-    {
-        types::StateID state_id = Derived::id();
+    static constexpr StateTag tag() { return { .name = TagName, .hash = util::hash(TagName) }; }
+
+    Derived& self() { return static_cast<Derived &>(*this); }
+    Derived const& self() const { return static_cast<Derived const&>(*this); }
+
+    constexpr std::array<StateTag, sizeof...(Transitions)> transitions() {
+        return { Transitions::tag()... };
     }
 
 private:
-    /// @brief Convenience member to access the derived type
-    Derived* derived() { return static_cast<Derived*>(this); }
+    // constexpr char const* const name() const { return TagName; }
+    // constexpr util::hash_t hash() const { return util::hash(TagName); }
+
 };
 
-}  // namespace fsm
-
-// #define DECLARE_STATE_CLASS(class_name, class_label) \
-//     class class_name : public State<class_name> {
-
-#endif  // FSM_SRC_FSM_STATE_H
+} // namespace fsm
+#endif  // FSM_SRC_LIB_STATE_H

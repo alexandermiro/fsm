@@ -1,12 +1,20 @@
 #ifndef STATE_PAUSED_H
 #define STATE_PAUSED_H
 
-#include "StateID.h"
+#include "state_common.h"
+#include "State.h"
+#include "EventReadyInit.h"
 
-struct StatePaused
+struct StatePausedTag {
+    static inline char const name[] = "PAUSED";
+};
+
+
+class StateCharging;
+
+struct StatePaused : fsm::State<StatePaused, StatePausedTag::name, StateCharging>
 {
-    DECLARE_STATE_ID_FUNC(fsm::States::PAUSED, "PAUSED")
-
+    fsm::action::DoNothing handle(EventReadyInit const& p_init);
 };
 
 #endif // STATE_PAUSED_H

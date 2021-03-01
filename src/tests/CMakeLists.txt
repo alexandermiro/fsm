@@ -12,6 +12,14 @@ add_executable(${subproj}
     main.cpp
     gtest_FiniteStateMachine.h
     gtest_for_each_tuple.h
+    StatePaused.h
+    StatePaused.cpp
+    StateConnected.h
+    StateConnected.cpp
+    StateReady.h
+    StateReady.cpp
+    StateCharging.h
+    StateCharging.cpp
 )
 
 set_property(TARGET ${subproj} PROPERTY CXX_STANDARD 17)
