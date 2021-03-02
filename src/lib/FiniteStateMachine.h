@@ -48,7 +48,8 @@ public:
     void handle(Event&& p_event) 
     {
         auto handle_event = [this, p_event] (auto p_state) {
-            p_state->self().handle(p_event); //.execute(*this);
+            auto action = p_state->impl().handle(p_event); 
+            action.execute(*this, p_state, p_event);
         };
         std::visit(handle_event, m_current_state);
     }

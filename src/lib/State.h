@@ -27,8 +27,8 @@ class State
 public:
     static constexpr types::StateTag tag() { return { .name = TagName, .hash = util::hash(TagName) }; }
 
-    Derived& self() { return static_cast<Derived &>(*this); }
-    Derived const& self() const { return static_cast<Derived const&>(*this); }
+    Derived& impl() { return static_cast<Derived &>(*this); }
+    Derived const& impl() const { return static_cast<Derived const&>(*this); }
 
     static constexpr std::array<types::StateTag, sizeof...(Transitions)> transitions() {
         return { Transitions::tag()... };
