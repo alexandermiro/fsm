@@ -21,41 +21,34 @@ using ::testing::_;
 using ::testing::StrictMock;
 
 
-TEST(FiniteStateMachine_creation, GIVEN_aCertainNumberOfStates_THEN_numStatesMustBeCorrect)
-{
-    {
-        // fsm::FiniteStateMachine<StateReady> fsm;
-        // EXPECT_EQ(fsm.num_states(), 1);
-    }
-    {
-        // fsm::FiniteStateMachine<StateReady, StateCharging, StatePaused> fsm;
-        // EXPECT_EQ(fsm.num_states(), 3);
-    }
-}
-
-TEST(FiniteStateMachine_stateID, GIVEN_states_THEN_returnCorrectStateIdentification)
-{
-    // fsm::FiniteStateMachine<StateReady, StateCharging, StatePaused> fsm;
-
-    // EXPECT_TRUE(fsm.has(StateReady::id()));
-    // EXPECT_TRUE(fsm.has(StateCharging::id()));
-    // EXPECT_TRUE(fsm.has(StatePaused::id()));
-}
-
-TEST(FiniteStateMachine_event, GIVEN_event_THEN_handleIt)
+TEST(FiniteStateMachine_event, GIVEN_wrong_order_event_THEN_do_not_change_state)
 {
     fsm::FiniteStateMachine<StateReady, StateConnected, StatePaused, StateCharging> fsm;
 
-    StateReady ready;
-    auto id = ready.tag();
+    EventEVGunConnected evt_ev_gun_connected;
+    fsm.handle(evt_ev_gun_connected);
 
-    for (auto& tag : ready.transitions()) 
-    {
-        std::cout << tag.name << std::endl;
-    }
+    EventReadyInit evt_ready_init{"Hi dear user"};
+    fsm.handle(evt_ready_init);
 
-    EventReadyInit event{"Hi dear user"};
-    fsm.handle(event);
+    auto const state_tag = fsm.current();
+
+    EXPECT_STREQ(state_tag.name, StateReadyTag::name);
+}
+
+TEST(FiniteStateMachine_event, GIVEN_correct_order_event_THEN_change_state)
+{
+    fsm::FiniteStateMachine<StateReady, StateConnected, StatePaused, StateCharging> fsm;
+
+    EventReadyInit evt_ready_init{"Hi dear user"};
+    fsm.handle(evt_ready_init);
+
+    EventEVGunConnected evt_ev_gun_connected;
+    fsm.handle(evt_ev_gun_connected);
+
+    auto const state_tag = fsm.current();
+
+    EXPECT_STREQ(state_tag.name, StateConnectedTag::name);
 }
 
 /**
@@ -72,7 +65,16 @@ public:
     {
     }
 
+    struct UnknownEvent { };
     
+    // fsm::FiniteStateMachine<StateReady, StateConnected, StatePaused, StateCharging> m_fsm;
+    fsm::FiniteStateMachine<StateReady> m_fsm;
 };
+
+
+TEST_F(ChargerFsmTest, GIVEN_eventNotSupported_THEN_doesNothing)
+{
+    m_fsm.handle(UnknownEvent{});
+}
 
 #endif  // FSM_SRC_TESTS_GTEST_FINITE_STATE_MACHINE_H

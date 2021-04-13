@@ -41,6 +41,9 @@ target_link_libraries(${subproj}
 
 # target_link_libraries(${subproj} PUBLIC gtest gmock pthread)
 
+target_compile_options(${subproj} PRIVATE
+     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
+     $<$<CXX_COMPILER_ID:MSVC>:/W4>)
 
 set_target_properties(${subproj}
     PROPERTIES

@@ -10,6 +10,7 @@
 
 namespace fsm {
 
+
 /**
  * @brief
  */
@@ -25,6 +26,7 @@ template <typename Derived
 class State 
 {
 public:
+
     static constexpr types::StateTag tag() { return { .name = TagName, .hash = util::hash(TagName) }; }
 
     Derived& impl() { return static_cast<Derived &>(*this); }
@@ -34,12 +36,20 @@ public:
         return { Transitions::tag()... };
     }
 
+
 protected:
     State() = default;
 
 private:
 
 };
+
+#define STATE_CLASS(StateClass, StateName, ...)                                                             \
+    using namespace fsm::action;                                                                            \
+    struct StateClass ## Tag { static inline char const name[] = #StateName; };    \
+    class StateClass : public ByDefaultDoNothing                                                            \
+                     , public fsm::State<StateClass, StateClass ## Tag::name, __VA_ARGS__>
+
 
 } // namespace fsm
 #endif  // FSM_SRC_LIB_STATE_H

@@ -7,7 +7,7 @@
 
 #include "fsm_types.h"
 #include "static_hash.h"
-#include "StateMetadata.h"
+// #include "StateMetadata.h"
 
 
 namespace fsm {

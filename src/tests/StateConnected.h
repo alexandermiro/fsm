@@ -6,14 +6,13 @@
 #include "State.h"
 #include "EventReadyInit.h"
 
+class StateReady;
 class StatePaused;
 
-struct StateConnectedTag {
-    static inline char const name[] = "CONNECTED";
-};
-
-struct StateConnected : fsm::State<StateConnected, StateConnectedTag::name, StatePaused>
+STATE_CLASS(StateConnected, CONNECTED, StatePaused, StateReady)
 {
+public:
+    using ByDefault::handle;
 
     fsm::action::DoNothing handle(EventReadyInit const& p_init);
 

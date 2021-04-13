@@ -47,9 +47,9 @@ public:
     template <typename Event>
     void handle(Event&& p_event) 
     {
-        auto handle_event = [this, p_event] (auto p_state) {
-            auto action = p_state->impl().handle(p_event); 
-            action.execute(*this, p_state, p_event);
+        auto handle_event = [this, event = std::move(p_event)] (auto p_state) {
+            auto action = p_state->impl().handle(event); 
+            action.execute(this, p_state, event);
         };
         std::visit(handle_event, m_current_state);
     }
@@ -59,13 +59,31 @@ public:
     template <typename State>
     State& transition_to()
     {
-        State& state = &std::get<State>(m_states);
-        m_current_state = &state;
-        return state;
+        auto state = &std::get<State>(m_states);
+        m_current_state = state;
+        return *state;
+    }
+    /**
+     * @brief Returns the current state information
+     * @return The current state tag
+     */
+    types::StateTag current() const 
+    {
+        types::StateTag curr_state_tag;
+        auto tag = [&] (auto p_state) { curr_state_tag = std::move(p_state->tag()); };
+        std::visit(tag, m_current_state);
+        return curr_state_tag;
     }
     /**
      * @brief
      */
+    types::StateTag previous() const 
+    {
+        types::StateTag prev_state_tag;
+        auto tag = [&] (auto p_state) { prev_state_tag = std::move(p_state->tag()); };
+        std::visit(tag, m_current_state);
+        return prev_state_tag;
+    }
 
 private:
     void generate_graph()
@@ -109,6 +127,8 @@ private:
 
     /// @brief The current state. The first state template parameter will be the very first state.
     std::variant<TStates*...> m_current_state{&std::get<0>(m_states)};
+
+    std::variant<TStates*...> m_previous_state{&std::get<0>(m_states)};
 
     /// @brief Contains the state machine graph
     StateGraph m_graph;

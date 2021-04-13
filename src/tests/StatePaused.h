@@ -5,15 +5,15 @@
 #include "State.h"
 #include "EventReadyInit.h"
 
-struct StatePausedTag {
-    static inline char const name[] = "PAUSED";
-};
 
-
+class StateReady;
 class StateCharging;
 
-struct StatePaused : fsm::State<StatePaused, StatePausedTag::name, StateCharging>
+STATE_CLASS(StatePaused, PAUSED, StateCharging, StateReady)
 {
+public:
+    using ByDefault::handle;
+
     fsm::action::DoNothing handle(EventReadyInit const& p_init);
 };
 

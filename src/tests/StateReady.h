@@ -10,28 +10,28 @@
 #include "State.h"
 
 
-struct StateReadyTag {
-    static inline char const name[] = "READY";
-};
+// struct StateReadyTag {
+//     static inline char const name[] = "READY";
+// };
 
 class StateCharging;
 class StateConnected;
 class StatePaused;
 
-struct StateReady  : fsm::State<StateReady
-                               , StateReadyTag::name
-                               , StateConnected
-                               , StateCharging
-                               , StatePaused>
+using namespace fsm::action;
+
+
+STATE_CLASS(StateReady, READY, StateConnected, StateCharging, StatePaused)
 {
+public:
+    using ByDefault::handle;        // TODO: eliminate this injecting the handler automatically
 
+    Maybe<TransitionTo<StateConnected>> handle(EventEVGunConnected const& p_ev_gun_connected);
 
-    // TRANSITION_TO(StateConnected) handle(EventEVGunConnected const& p_ev_gun_connected) 
-    // {
-    //     return fsm::action::TransitionTo<StateConnected>{};
-    // }
+    DoNothing handle(EventReadyInit const& p_init);
 
-    fsm::action::DoNothing handle(EventReadyInit const& p_init);
+private:
+    bool m_initialized{false};
 };
 
 #endif  // STATE_READY_H

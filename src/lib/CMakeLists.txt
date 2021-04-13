@@ -19,3 +19,6 @@ target_include_directories(fsm-lib
 
 target_compile_features(fsm-lib INTERFACE cxx_std_17)
 
+target_compile_options(fsm-lib INTERFACE
+     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
+     $<$<CXX_COMPILER_ID:MSVC>:/W4>)
